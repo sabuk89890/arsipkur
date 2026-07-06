@@ -520,39 +520,52 @@ function ProgramFormModal({ program, onClose, onSaved, kategori, tahunList }: { 
 // =======================================================
 function UploadFileModal({ program, onClose, onSaved, user }: { program: Program | null; onClose: () => void; onSaved: () => void; user: User }) {
   const [programId, setProgramId] = useState(program?.id || "");
-  const [file, setFile] = useState<File | null>(null);
+  const [fileUrl, setFileUrl] = useState("");
+  const [namaFile, setNamaFile] = useState("");
   const [keterangan, setKeterangan] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const programs = program ? [program] : getPrograms();
 
-  const pickFile = (f: File | null) => {
-    setError("");
-    if (!f) return setFile(null);
-    const tipe = detectTipe(f);
-    if (!tipe) { setError("Format file tidak didukung. Gunakan PDF, Word, Excel, atau JPG/PNG."); return; }
-    if (tipe === "image") { if (f.size > MAX_IMG_SIZE) { setError(`Ukuran gambar maksimal 100 KB. File ini ${formatBytes(f.size)}.`); return; } }
-    else { if (f.size > MAX_DOC_SIZE) { setError(`Ukuran dokumen maksimal 3 MB. File ini ${formatBytes(f.size)}.`); return; } }
-    setFile(f);
+  const getFileType = (url: string): FileItem["tipeFile"] | null => {
+    const lower = url.toLowerCase();
+    if (lower.includes(".pdf")) return "pdf";
+    if (lower.includes(".doc") && !lower.includes(".docx")) return "doc";
+    if (lower.includes(".docx")) return "docx";
+    if (lower.includes(".xls") && !lower.includes(".xlsx")) return "xls";
+    if (lower.includes(".xlsx")) return "xlsx";
+    if (/\.(jpg|jpeg|png|gif)$/i.test(lower)) return "image";
+    return null;
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) { setError("Pilih file terlebih dahulu."); return; }
+    setError("");
+
+    if (!fileUrl.trim()) { setError("Masukkan URL file terlebih dahulu."); return; }
+    if (!namaFile.trim()) { setError("Masukkan nama file terlebih dahulu."); return; }
     if (!programId) { setError("Pilih program terlebih dahulu."); return; }
-    setError(""); setLoading(true);
+
     try {
-      const tipe = detectTipe(file)!;
-      const dataUrl = await fileToDataUrl(file);
+      const url = fileUrl.trim();
+      if (!url.startsWith("http")) { setError("URL harus dimulai dengan http atau https."); return; }
+
+      const tipe = getFileType(url);
+      if (!tipe) { setError("Tipe file tidak didukung. Gunakan PDF, Word, Excel, atau JPG/PNG."); return; }
+
       addFileToProgram(programId, {
-        id: uid(), namaFile: file.name, tipeFile: tipe, ukuran: file.size, dataUrl,
-        tanggalUpload: new Date().toISOString(), uploader: user.username, keterangan: keterangan.trim(),
+        id: uid(),
+        namaFile: namaFile.trim(),
+        tipeFile: tipe,
+        ukuran: 0,
+        dataUrl: url,
+        tanggalUpload: new Date().toISOString(),
+        uploader: user.username,
+        keterangan: keterangan.trim(),
       });
       onSaved();
     } catch (err) { setError("Gagal menyimpan file."); }
-    setLoading(false);
   };
 
   return (
@@ -568,24 +581,37 @@ function UploadFileModal({ program, onClose, onSaved, user }: { program: Program
           </div>
         )}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">File *</label>
-          <div onClick={() => inputRef.current?.click()} className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 transition">
-            {file ? (
-              <div className="flex items-center justify-center gap-3"><span className="text-2xl"></span><div className="text-left"><p className="font-medium text-slate-800 text-sm">{file.name}</p><p className="text-xs text-slate-500">{formatBytes(file.size)}</p></div></div>
-            ) : (
-              <><div className="text-3xl mb-2">⬆</div><p className="font-medium text-slate-700 text-sm">Klik untuk memilih file</p><p className="text-xs text-slate-500 mt-1">PDF, Word, Excel (max 3 MB) · JPG/PNG (max 100 KB)</p></>
-            )}
-            <input ref={inputRef} type="file" hidden onChange={(e) => pickFile(e.target.files?.[0] || null)} accept=".pdf,.doc,.docx,.xls,.xlsx,image/jpeg,image/png,image/jpg" />
-          </div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">URL File *</label>
+          <input
+            type="url"
+            value={fileUrl}
+            onChange={(e) => setFileUrl(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="https://example.com/file.pdf"
+          />
+          <p className="text-xs text-slate-500 mt-1">Paste URL dari Google Drive, Dropbox, atau cloud storage lainnya</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Nama File *</label>
+          <input
+            type="text"
+            value={namaFile}
+            onChange={(e) => setNamaFile(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Mis. SK_MPLS_2024.pdf"
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Keterangan File (opsional)</label>
           <input type="text" value={keterangan} onChange={(e) => setKeterangan(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Mis. Daftar hadir hari ke-3" />
         </div>
         {error && <div className="bg-rose-50 border border-rose-200 text-rose-700 text-sm px-3 py-2 rounded-lg">{error}</div>}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
+           <b>💡 Tips:</b> Gunakan URL publik dari Google Drive, Dropbox, OneDrive, atau cloud storage lainnya. Database hanya menyimpan link, bukan file.
+        </div>
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
           <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 text-sm">Batal</button>
-          <button type="submit" disabled={loading} className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm hover:shadow-lg disabled:opacity-60">{loading ? "Mengupload..." : "Upload File"}</button>
+          <button type="submit" disabled={loading} className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm hover:shadow-lg disabled:opacity-60">{loading ? "Menyimpan..." : "Simpan Link File"}</button>
         </div>
       </form>
     </ModalShell>
