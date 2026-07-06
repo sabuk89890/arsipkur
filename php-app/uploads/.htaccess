@@ -1,0 +1,25 @@
+# Proteksi keamanan untuk folder uploads
+# Cegah eksekusi file PHP dan akses tidak sah
+
+# Disable execution of scripts
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Apache 2.4 syntax
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+# Cegah directory listing
+Options -Indexes
+
+# Set headers untuk file yang di-serve
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx)$">
+        Header set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+</IfModule>

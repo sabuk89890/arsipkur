@@ -1,0 +1,24 @@
+# Proteksi keamanan untuk root aplikasi
+
+# Cegah akses langsung ke file sensitif
+<FilesMatch "^(config\.php|setup_passwords\.php|database\.sql)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "^(config\.php|setup_passwords\.php|database\.sql)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+# Cegah directory listing
+Options -Indexes
+
+# Default index
+DirectoryIndex index.php
+
+# PHP settings (optional — uncomment jika perlu)
+# php_value upload_max_filesize 5M
+# php_value post_max_size 6M
+# php_value max_execution_time 60

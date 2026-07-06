@@ -1,0 +1,82 @@
+================================================================
+CHECKLIST INSTALASI APLIKASI ARSIP KURIKULUM - XAMPP
+================================================================
+
+Silakan centang (√) setiap langkah setelah selesai:
+
+[  ] 1. XAMPP terinstall di C:\xampp
+[  ] 2. Apache dan MySQL running di XAMPP Control Panel (hijau)
+[  ] 3. Folder C:\xampp\htdocs\arsip-kurikulum\ dibuat
+[  ] 4. SEMUA file dari php-app/ dicopy ke folder tersebut
+[  ] 5. Database "arsip_kurikulum" dibuat di phpMyAdmin
+[  ] 6. File database.sql sudah diimport ke database
+[  ] 7. Tabel users, kategori, tahun_ajaran, program, file_arsip ada
+[  ] 8. setup_passwords.php sudah dijalankan di browser
+[  ] 9. setup_passwords.php sudah DIHAPUS dari folder
+[  ] 10. Bisa akses http://localhost/arsip-kurikulum/
+[  ] 11. Bisa login sebagai admin (burnitelong / 10105158)
+[  ] 12. Bisa login sebagai guru (gurusabuk / 10105158)
+[  ] 13. Folder uploads/ ada dan bisa write
+[  ] 14. Folder backups/ ada
+
+================================================================
+DAFTAR FILE YANG HARUS ADA
+================================================================
+
+Di C:\xampp\htdocs\arsip-kurikulum\:
+
+[  ] index.php
+[  ] dashboard.php
+[  ] api.php
+[  ] download.php
+[  ] preview.php
+[  ] logout.php
+[  ] config.php
+[  ] database.sql
+[  ] README.md
+[  ] INSTALL_XAMPP.md
+[  ] CHECKLIST.txt
+[  ] .htaccess
+[  ] assets/
+      [  ] style.css
+[  ] uploads/
+      [  ] .htaccess
+[  ] backups/
+      [  ] .htaccess
+
+================================================================
+TEST FITUR
+================================================================
+
+Sebagai Admin:
+[  ] Bisa buat program baru
+[  ] Bisa upload file ke program
+[  ] Bisa lihat/preview dokumen
+[  ] Bisa download file
+[  ] Bisa edit program
+[  ] Bisa hapus program
+[  ] Bisa kelola kategori (tambah/hapus)
+[  ] Bisa kelola tahun ajaran (tambah/hapus/toggle)
+[  ] Bisa backup data
+[  ] Bisa restore data
+
+Sebagai Guru:
+[  ] Bisa lihat daftar program
+[  ] Bisa lihat detail program
+[  ] Bisa preview dokumen
+[  ] Bisa download file
+[  ] TIDAK bisa upload/edit/hapus/kelola
+
+================================================================
+BACKUP RUTIN
+================================================================
+
+Disarankan backup setiap bulan:
+
+[  ] Download backup JSON dari aplikasi
+[  ] Copy folder uploads/ ke tempat aman
+[  ] Simpan di minimal 2 lokasi (komputer + cloud)
+
+================================================================
+
+Jika semua checklist tercentang, aplikasi siap digunakan! 🎉

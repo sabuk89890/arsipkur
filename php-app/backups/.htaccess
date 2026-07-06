@@ -1,0 +1,11 @@
+# Proteksi folder backups - tidak bisa diakses dari web
+<FilesMatch ".*">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+<IfModule mod_authz_core.c>
+    <FilesMatch ".*">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+Options -Indexes
